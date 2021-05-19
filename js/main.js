@@ -26,9 +26,9 @@ const col_main = "#40752D",
 	col_main_lightest = "#ECF4E9";
 
 // settings
-var gameSpeed = 1,
+var gameSpeed = 0,
 	season = SUMMER,
-	debug = true, // verbose output and display
+	debug = false, // verbose output and display
 	debugUpdateDelay = FRAMES_PER_SEC / 3; // in frames
 
 var speedLimit = true, // fps upper limit to defined value of FRAMES_PER_SEC
@@ -39,7 +39,8 @@ var speedLimit = true, // fps upper limit to defined value of FRAMES_PER_SEC
 var frameCounter = 0, // frame counter, integer increased each tick
 	fpsShow = 0, // buffered value for delay	
 	timeCounter = 0, // current day time normalized to distance on unit circle
-	timeCounterRelative = 0, // percent of full day 
+	timeCounterRelative = 0, // percent of full day
+	dayNr = 0;
 	fpsNow = 0, // true time since last frame may vary and therefore the fps
 	then = Date.now(), // time reference for deltaT
 	deltaT = 0; // progress in ms since last frame
@@ -54,11 +55,11 @@ var fontRegular;
 var pause, play, faster, fastest;
 
 // indicators
-var i_energy, i_light, i_melatonin;
+var i_energy, i_light, i_melatonin, i_heart;
 
 const imgSize = 640;
 var edge = 600, padding = 10;
-var bed, bonsai, lamp, desk, ball, shelf, chair, laptop, counter, wecker, monitor, board;
+var bed, bonsai, lamp, desk, ball, shelf, chair, laptop, counter, wecker, monitor, board, ceilingLamp;
 
 var dailySchedule = [
 	"Sleep",
@@ -82,7 +83,7 @@ var dailySchedule = [
 	"Recreation",
 	"Recreation",
 	"Work",
-	"Work",
+	"Recreation",
 	"Recreation",
 	"Sleep"
 ];
@@ -149,53 +150,72 @@ const fenster = {
 	w: 250,
 	h: 150
 }, i_ball = {
-	x: 600,
-	y: 600,
+	x: 1050,
+	y: 570,
 	w: 50,
 	h: 50
 }, i_lamp = {
-	x: 300,
-	y: 560,
+	x: 580,
+	y: 490,
 	w: 100,
 	h: 140
 }, i_bed = {
-	x: 440,
-	y: 600,
+	x: 240,
+	y: 500,
 	w: 400,
 	h: 200
 }, i_bonsai = {
-	x: 700,
-	y: 570,
+	x: 650,
+	y: 520,
 	w: 100,
 	h: 100
 }, i_desk = {
-	x: 950,
-	y: 570,
+	x: 830,
+	y: 490,
 	w: 240,
 	h: 160
 }, i_chair = {
-	x: 800,
-	y: 600,
+	x: 730,
+	y: 510,
 	w: 140,
 	h: 180
 }, i_laptop = {
-	x: 950,
-	y: 480,
+	x: 910,
+	y: 455,
 	w: 80,
 	h: 50
 }, i_board = {
-	x: 1130,
-	y: 440,
+	x: 1000,
+	y: 350,
 	w: 260,
 	h: 190
 }, i_shelf = {
-	x: 680,
-	y: 400,
+	x: 620,
+	y: 360,
 	w: 120,
 	h: 80
 }, i_counter = {
-	x: 440,
-	y: 630,
+	x: 290,
+	y: 590,
 	w: 300,
 	h: 80
+}, i_postit = {
+	x: 1030,
+	y: 370,
+	w: 40,
+	h: 40
+}, i_ceilingLamp = {
+	x: 830,
+	y: 180,
+	w: 80,
+	h: 90
 };
+
+var infoBoxLongFiller = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod temporiii incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+infoBoxGameInfo = "<b>SLEEP GAME</b><br> Simulate your Day-Night! Organize your day in order to stay energetic and healthy. Sleep is a naturally recurring state of mind and body, characterized by altered consciousness, relatively inhibited sensory activity, reduced muscle activity and inhibition of nearly all voluntary muscles during rapid eye movement (REM) sleep, and reduced interactions with surroundings.",
+infoBoxLight = "<b>Light</b><br> When eyes receive light from the sun, the pineal gland's production of melatonin is inhibited and the hormones produced keep the human awake. When the eyes do not receive light, melatonin is produced in the pineal gland and the human becomes tired.",
+infoBoxMelatonin = "<b>Melatonin</b><br> Melatonin is a hormone primarily released by the pineal gland at night, and has long been associated with control of the sleep–wake cycle.",
+infoBoxEnergy = "<b>Energy</b><br> This indicator displays your current energy level. A full bar means you have plenty of energy to spare for the tasks of the day such as programming a game about sleep. A low bar means you are very tired and should go to sleep. Staying awake for extended periods of time on end can have negative effects on your health!",
+infoBoxHealth = "<b>Health</b><br> Sleep has a direct effect on your health! Sleep plenty to stay healthy. Not sleeping enough can make you sick as your body has a no time regenerate and fight off diseases. Not sleeping for several days can even be fatal!",
+infoBoxSchedule = "<b>Schedule</b><br> This is your schedule. It shows your daily routine in hourly segments starting at 0 (the first hour of the day) and ending at 23. You can adjust it by clicking on the colored boxes next to an activity and then clicking in the position in the schedule.",
+infoBoxGameOver = "<b>Game Over</b><br> Your health ran out. Please restart the game by pressing F5."
