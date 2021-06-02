@@ -42,14 +42,14 @@ function draw() {
 }
 
 var sliderToolTip, difMap = ["Easy", "Normal", "Hard"]
-function difSliderOnChange(event){
+function difSliderOnChange(event) {
 	difficulty = event.target.value;
 	let difName = difMap[difficulty - 1]
-	sliderToolTip.html("<span class=\"dif" + difName + "\">"+difName+"</span>");
+	sliderToolTip.html("<span class=\"dif" + difName + "\">" + difName + "</span>");
 }
 
 var difficulty = 2;
-function loadSelectors(){	
+function loadSelectors() {
 	// difficulty
 	//sDifficulty = createImg('img/rubiks-cube-145949_640.png').position(790, 80).size(40, 40);
 	sDifficulty = createImg('img/rubiks-cube-157058_640.png').position(820, 80).size(40, 40);
@@ -62,13 +62,13 @@ function loadSelectors(){
 	difSlider.style('width', '60px');
 	sliderToolTip = createSpan().addClass("tooltiptext");
 	let difName = difMap[difficulty - 1]
-	sliderToolTip.html("<span class=\"dif" + difName + "\">"+difName+"</span>");
+	sliderToolTip.html("<span class=\"dif" + difName + "\">" + difName + "</span>");
 
 	difSlider.parent(divDifSlider);
 	sliderToolTip.parent(divDifSlider);
 
 	difSlider.input(difSliderOnChange);
-	
+
 	// random
 	sRandom = createImg('img/dice-151867_640.png').position(820, 140).size(40, 40);
 	sRandom.elt.draggable = false;
@@ -82,47 +82,47 @@ function loadSelectors(){
 	randomToggleSlider.mouseReleased(toggleRandomEvents)
 
 	let randomToggleInput = createInput('', 'checkbox')
-	
+
 	randomToggleInput.parent(randomToggleContainer);
 	randomToggleSlider.parent(randomToggleContainer);
 }
 
 var randomEventsEnabled = false;
-function toggleRandomEvents(){
+function toggleRandomEvents() {
 	randomEventsEnabled = !randomEventsEnabled;
 }
 
 var spawnFrame = -1
-function randomEvent(){
-	if(gameSpeed == 0) {
+function randomEvent() {
+	if (gameSpeed == 0) {
 		return;
 	}
 
 	// handle current event
-	if(currRandomEvent !== undefined){
+	if (currRandomEvent !== undefined) {
 		//handle long running random event
 	}
 
 	// no events
-	if(randomEventsEnabled == false) {
+	if (randomEventsEnabled == false) {
 		return;
-	} 
-	if(spawnFrame > frameCounterGame) {
+	}
+	if (spawnFrame > frameCounterGame) {
 		// not time yet
 		return;
-	} 
-	if(spawnFrame + 4 < frameCounterGame) {
+	}
+	if (spawnFrame + 4 < frameCounterGame) {
 		currRandomEvent = undefined;
 		spawnFrame = RAND(MIN_PER_DAY * 10);
 	}
-	
+
 	else {
 		spawnRandomEvent();
 	}
 }
 
 var currRandomEvent, currEventDescription, eventEndDay, eventEndHour, eventEndMin;
-function spawnRandomEvent(){
+function spawnRandomEvent() {
 	// pause game
 	pause.elt.classList.remove("selected");
 	play.elt.classList.remove("selected");
@@ -134,25 +134,25 @@ function spawnRandomEvent(){
 	// get random unspawned event from list
 	currRandomEvent = randomEvents[RAND(randomEvents.length)]
 	currEventDescription = currRandomEvent["desc"];
-	if(currRandomEvent["singular"] == false) {
-		
+	if (currRandomEvent["singular"] == false) {
+
 		let currentMins = floor(map(timeCounterRelative, 0, 1, 0, 1440));
 		let endMinsTotal = currentMins + currRandomEvent["duration"];
 		let eventEndDay = dayNr + floor(endMinsTotal / MIN_PER_DAY);
 		let endMins = endMinsTotal % MIN_PER_DAY;
 		let eventEndHour = floor(endMins / 60);
 		var eventEndMin = floor(endMins % 60);
-		
-		currEventDescription = currEventDescription 
-		+ " The event will end at "
-		+ eventEndHour.toLocaleString(undefined, digits) + ":" + eventEndMin.toLocaleString(undefined, digits)
-		+ " on day " + eventEndDay;
-	} 
 
-	if(currRandomEvent["id"] == "food_01"){
+		currEventDescription = currEventDescription
+			+ " The event will end at "
+			+ eventEndHour.toLocaleString(undefined, digits) + ":" + eventEndMin.toLocaleString(undefined, digits)
+			+ " on day " + eventEndDay;
+	}
+
+	if (currRandomEvent["id"] == "food_01") {
 		currFood = 0;
 		currRandomEvent = undefined
-	} else if(currRandomEvent["id"] == "work_02"){
+	} else if (currRandomEvent["id"] == "work_02") {
 		currEnergy = maxEnergy;
 		currFood = maxFood;
 		currHappiness = maxHappiness;
@@ -272,11 +272,11 @@ function drawRoom() {
 	image(outdoor, fenster.x + padding, fenster.y + padding, fenster.w - (2 * padding), fenster.h - (2 * padding));
 	let sunHeight = (getSunHeight() + 1) / 2;
 	// blue
-	let c = color('hsba(197, 43%, ' + season(sunHeight) + '%, '+ (1-0.99*sunHeight) +')');
+	let c = color('hsba(197, 43%, ' + season(sunHeight) + '%, ' + (1 - 0.99 * sunHeight) + ')');
 	fill(c);
 	rect(fenster.x + padding, fenster.y + padding, fenster.w - (2 * padding), fenster.h - (2 * padding));
 	image(windowFrame, fenster.x, fenster.y, fenster.w, fenster.h);
-	
+
 	// ceiling
 	fill("LightSlateGray");
 	rect(0, height - edge, width, -edge);
@@ -413,7 +413,7 @@ function showGameOverInfo() {
 
 	lastGameSpeed = gameSpeed = 0;
 	pause.elt.classList.toggle("selected");
-	
+
 	var currentMins = floor(map(timeCounterRelative, 0, 1, 0, 1440));
 	var hour = floor(currentMins / 60);
 	var min = floor(currentMins % 60);
@@ -470,40 +470,40 @@ function loadIndicators() {
 }
 
 // sad, unhappy, neutral, happy, ecstatic
-var happinessState, 
-// has to be the same as in loadIndicators
-indicatorDim = 50;
-function setHappiness(){
-	if(currHappiness < 20 && happinessState !== "sad"){
+var happinessState,
+	// has to be the same as in loadIndicators
+	indicatorDim = 50;
+function setHappiness() {
+	if (currHappiness < 20 && happinessState !== "sad") {
 		print("bla");
 		happinessState = "sad";
 		hideAllSmileys();
 		i_smiley_sad.size(indicatorDim, indicatorDim);
-	} else if(currHappiness >= 20 && currHappiness < 40 && happinessState !== "unhappy"){
+	} else if (currHappiness >= 20 && currHappiness < 40 && happinessState !== "unhappy") {
 		happinessState = "unhappy";
 		hideAllSmileys();
 		i_smiley_unhappy.size(indicatorDim, indicatorDim);
-	} else if(currHappiness >= 40 && currHappiness < 60 && happinessState !== "neutral"){
+	} else if (currHappiness >= 40 && currHappiness < 60 && happinessState !== "neutral") {
 		happinessState = "neutral";
 		hideAllSmileys();
 		i_smiley_neutral.size(indicatorDim, indicatorDim);
-	} else if(currHappiness >= 60 && currHappiness < 80 && happinessState !== "happy"){
+	} else if (currHappiness >= 60 && currHappiness < 80 && happinessState !== "happy") {
 		happinessState = "happy";
 		hideAllSmileys();
 		i_smiley_happy.size(indicatorDim, indicatorDim);
-	} else if(currHappiness >= 80 && happinessState !== "ecstatic"){
+	} else if (currHappiness >= 80 && happinessState !== "ecstatic") {
 		happinessState = "ecstatic";
 		hideAllSmileys();
 		i_smiley_ecstatic.size(indicatorDim, indicatorDim);
-	} 
+	}
 }
 
-function hideAllSmileys(){
-	i_smiley_sad.size(0,0);
-	i_smiley_unhappy.size(0,0);
-	i_smiley_neutral.size(0,0);
-	i_smiley_happy.size(0,0);
-	i_smiley_happy.size(0,0);
+function hideAllSmileys() {
+	i_smiley_sad.size(0, 0);
+	i_smiley_unhappy.size(0, 0);
+	i_smiley_neutral.size(0, 0);
+	i_smiley_happy.size(0, 0);
+	i_smiley_happy.size(0, 0);
 }
 
 function getScheduledActivity() {
@@ -529,7 +529,7 @@ function drawIndicators() {
 	rect(map(timeCounterRelative, 0, 1, startingX, startingX + (24 * w)), startingY + w, 5, 10);
 
 	var jitter = 0;
-	if(map(currHealth, 0, maxHealth, 0, 1) < 0.25) {
+	if (map(currHealth, 0, maxHealth, 0, 1) < 0.25) {
 		// health bar jitter
 		jitter = RAND(5);
 	}
@@ -572,7 +572,7 @@ function drawIndicators() {
 				break;
 			case "Recreation":
 				// if you are exposed to darkness recreation will be double as exhausting
-				energyPerHour = currMelatonin < 0.5 ? -1/3 : -2/3;
+				energyPerHour = currMelatonin < 0.5 ? -1 / 3 : -2 / 3;
 				energyPerTick = energyPerHour / 60;
 				currEnergy += energyPerTick * gameSpeed;
 				break;
@@ -590,23 +590,27 @@ function drawIndicators() {
 
 	fill("navy");
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currEnergy, 0, maxEnergy, 0, maxW), dim - 20);
-	
+
 	// health
 	if (gameSpeed != 0) {
-		if(currEnergy < maxEnergy*0.03) {
-			currHealth -= 1/60 * gameSpeed;
-		} else if(currEnergy > maxEnergy*0.9) {
-			currHealth += 1/60 * gameSpeed;
+		if (currFood < maxFood * 0.03) {
+			currHealth -= 1 / 60 * gameSpeed * 2;
+		} else {
+			if (currEnergy < maxEnergy * 0.03) {
+				currHealth -= 1 / 60 * gameSpeed;
+			} else if (currEnergy > maxEnergy * 0.9) {
+				currHealth += 1 / 60 * gameSpeed;
+			}
 		}
 		// energy cannot be lower than 0 and not higher than maxEnergy
 		currHealth = min(maxHealth, currHealth);
 		currHealth = max(0, currHealth);
 
-		if(currHealth == 0){
+		if (currHealth == 0) {
 			gameOver();
 		}
 	}
-	
+
 	fill("maroon");
 	rect(xPos + dim + 10 + jitter, yPos + (dim * 1.2 * p++) + 10 + jitter, map(currHealth, 0, maxHealth, 0, maxW), dim - 20);
 
@@ -614,11 +618,11 @@ function drawIndicators() {
 	// 1h work = +3 food
 	// 1h else = -1/3 food
 	if (gameSpeed != 0) {
-		if(getScheduledActivity() == "Work") {
+		if (getScheduledActivity() == "Work") {
 			let gainFactor = currHappiness < 40 ? 1.5 : 3;
-			currFood += (1/60 * gameSpeed) * gainFactor;
+			currFood += (1 / 60 * gameSpeed) * gainFactor;
 		} else {
-			currFood -= (1/60 * gameSpeed) * 1/3;
+			currFood -= (1 / 60 * gameSpeed) * 1 / 3;
 		}
 
 		// food cannot be lower than 0 and not higher than maxFood
@@ -628,13 +632,13 @@ function drawIndicators() {
 
 	fill("limegreen");
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currFood, 0, maxFood, 0, maxW), dim - 20);
-	
+
 	//happiness
 	if (gameSpeed != 0) {
 		let moodFactor = 1, scheduleFactor;
 
-		if(currEnergy <= maxEnergy/10 || currHealth <= maxHealth/2){
-			if(getScheduledActivity() == "Work") {
+		if (currEnergy <= maxEnergy / 10 || currHealth <= maxHealth / 2) {
+			if (getScheduledActivity() == "Work") {
 				// negative effect doubled
 				if (difficulty == 1) {
 					moodFactor = 0;
@@ -643,30 +647,30 @@ function drawIndicators() {
 				}
 			} else {
 				// positive effect halved
-				moodFactor = 1/2;
+				moodFactor = 1 / 2;
 			}
-		} 
-		
-		if(getScheduledActivity() == "Recreation") {
+		}
+
+		if (getScheduledActivity() == "Recreation") {
 			// increase
 			scheduleFactor = 1;
-		} else if(getScheduledActivity() == "Work") {
-			
-			if(difficulty == 1) { 
-				scheduleFactor = 1/5;
+		} else if (getScheduledActivity() == "Work") {
+
+			if (difficulty == 1) {
+				scheduleFactor = 1 / 5;
 			}
 			// decrease
-			else if(difficulty == 3) { 
+			else if (difficulty == 3) {
 				scheduleFactor = (-4);
 			} else {
 				scheduleFactor = (-2);
 			}
 		} else {
 			// slight increase
-			scheduleFactor = 1/3;
+			scheduleFactor = 1 / 3;
 		}
-		currHappiness += (1/60 * gameSpeed) * scheduleFactor * moodFactor;
-		
+		currHappiness += (1 / 60 * gameSpeed) * scheduleFactor * moodFactor;
+
 		// Happiness cannot be lower than 0 and not higher than maxHappiness
 		currHappiness = min(maxHappiness, currHappiness);
 		currHappiness = max(0, currHappiness);
@@ -678,7 +682,7 @@ function drawIndicators() {
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currHappiness, 0, maxHappiness, 0, maxW), dim - 20);
 }
 
-function gameOver(){
+function gameOver() {
 	showGameOverInfo();
 }
 
@@ -885,10 +889,10 @@ function updateClock() {
 	currMin = floor(currentMins % 60);
 	clockTooltip.html("Time:\t" + currHour.toLocaleString(undefined, digits) + ":" + currMin.toLocaleString(undefined, digits));
 	clockTooltip.html("<br>Day:\t" + dayNr, true);
-	
+
 	const hourDeg = ((currHour + 11) % 12 + 1) * 30;
 	const minuteDeg = currMin * 6;
-	
+
 	document.querySelector('.hour').style.transform = `rotate(${hourDeg}deg)`;
 	document.querySelector('.minute').style.transform = `rotate(${minuteDeg}deg)`;
 }
